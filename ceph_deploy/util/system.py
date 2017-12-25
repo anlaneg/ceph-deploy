@@ -16,6 +16,7 @@ def executable_path(conn, executable):
     return executable_path
 
 
+#检测系统是否采用systemd来进行引导
 def is_systemd(conn):
     """
     Attempt to detect if a remote system is a systemd one or not

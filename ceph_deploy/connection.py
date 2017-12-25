@@ -10,6 +10,7 @@ def get_connection(hostname, username, logger, threads=5, use_sudo=None, detect_
     if username:
         hostname = "%s@%s" % (username, hostname)
     try:
+        #remoto是一个通过ssh连接来执行command的库
         conn = remoto.Connection(
             hostname,
             logger=logger,

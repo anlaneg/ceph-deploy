@@ -15,8 +15,10 @@ import re
 def platform_information(_linux_distribution=None):
     """ detect platform information from remote host """
     linux_distribution = _linux_distribution or platform.linux_distribution
+    #提取当前系统的名称，发行版本，及版本名称（通过/etc/lsb-release获取）
     distro, release, codename = linux_distribution()
     if not distro:
+        #如果解析失败，则采用/etc/os-release来解析
         distro, release, codename = parse_os_release()
     if not codename and 'debian' in distro.lower():  # this could be an empty string in Debian
         debian_codenames = {
@@ -60,6 +62,7 @@ def parse_os_release(release_path='/etc/os-release'):
             parts = line.split('=')
             if len(parts) != 2:
                 continue
+            #将/etc/os-release文件中的非注释行，按'='分拆成两部分，组成一个dict
             release_info[parts[0].strip()] = parts[1].strip("\"'\n\t ")
     # In theory, we want ID/NAME, VERSION_ID and VERSION_CODENAME (with a
     # possible fallback to VERSION on the latter), based on information at:
@@ -100,6 +103,7 @@ def write_sources_list_content(content, filename='ceph.list', mode=0o644):
     write_file(repo_path, content.encode('utf-8'), mode)
 
 
+#写yum仓库配置文件
 def write_yum_repo(content, filename='ceph.repo'):
     """add yum repo file in /etc/yum.repos.d/"""
     repo_path = os.path.join('/etc/yum.repos.d', filename)

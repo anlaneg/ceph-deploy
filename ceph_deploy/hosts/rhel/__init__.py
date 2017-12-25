@@ -29,5 +29,6 @@ def choose_init(module):
 
     return 'systemd'
 
+#返回此系统对应的安装方式
 def get_packager(module):
     return pkg_managers.Yum(module)

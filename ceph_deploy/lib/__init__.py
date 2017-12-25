@@ -24,4 +24,5 @@ try:
     from .vendor import remoto
 except ImportError:
     # normally installed
+    #通常，我们直接加载remoto模块
     import remoto  # noqa

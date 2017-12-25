@@ -1,4 +1,4 @@
-
+#encoding:utf-8
 
 ceph_repo = """[ceph]
 name=Ceph packages for $basearch
@@ -36,7 +36,7 @@ gpgkey={gpg_url}
 enabled=1
 """
 
-
+#完成repo定制
 def custom_repo(**kw):
     """
     Repo files need special care in that a whole line should not be present

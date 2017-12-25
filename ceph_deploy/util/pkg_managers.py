@@ -18,6 +18,7 @@ class PackageManager(object):
         self.remote_conn = remote_conn.conn
 
     def _run(self, cmd, **kw):
+        #在远端执行命令
         return remoto.process.run(
             self.remote_conn,
             cmd,
@@ -61,6 +62,7 @@ class RPMManagerBase(PackageManager):
     Base class to hold common pieces of Yum and DNF
     """
 
+    #可执行程序
     executable = None
     name = None
 
@@ -74,12 +76,14 @@ class RPMManagerBase(PackageManager):
             '-y',
             'install',
         ]
+        #扩展参数
         if extra_flags:
             if isinstance(extra_flags, str):
                 extra_flags = [extra_flags]
             cmd.extend(extra_flags)
 
         cmd.extend(packages)
+        #执行命令
         return self._run(cmd)
 
     def remove(self, packages, **kw):
@@ -114,6 +118,7 @@ class RPMManagerBase(PackageManager):
         cmd = ['rpm', '--import', url]
         self._run(cmd)
 
+    #添加远程仓库
     def add_repo(self, name, url, **kw):
         gpg_url = kw.pop('gpg_url', None)
         if gpg_url:
@@ -146,6 +151,7 @@ class RPMManagerBase(PackageManager):
             '%s.repo' % name
         )
 
+    #远程仓库移除
     def remove_repo(self, name):
         filename = os.path.join(
             '/etc/yum.repos.d',
@@ -212,6 +218,7 @@ class Apt(PackageManager):
                 extra_flags = [extra_flags]
             cmd.extend(extra_flags)
         cmd.extend(packages)
+        #实现apt-get安装
         return self._run(cmd)
 
     def remove(self, packages, **kw):

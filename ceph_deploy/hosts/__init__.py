@@ -50,6 +50,7 @@ def get(hostname,
         detect_sudo=detect_sudo
     )
     try:
+        #将需要在远端执行的代码载入远端
         conn.import_module(remotes)
     except IOError as error:
         if 'already closed' in getattr(error, 'message', ''):
