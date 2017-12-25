@@ -1,3 +1,4 @@
+#encoding:utf-8
 from setuptools import setup, find_packages
 import os
 import sys
@@ -56,6 +57,7 @@ setup(
             'ceph-deploy = ceph_deploy.cli:main',
             ],
 
+        #定义不同命令对应的处理函数
         'ceph_deploy.cli': [
             'new = ceph_deploy.new:make',
             'install = ceph_deploy.install:make',

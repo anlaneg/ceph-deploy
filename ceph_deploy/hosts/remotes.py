@@ -1,3 +1,4 @@
+#encoding:utf-8
 try:
     import configparser
 except ImportError:

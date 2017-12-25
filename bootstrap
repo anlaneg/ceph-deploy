@@ -12,15 +12,18 @@ if ! [ -d virtualenv ]; then
             python_package="python$1"
         fi
 
+		#通过分析是debian还是redhat来通过deb或者rmp方式要求安装必要的软件
         case "$(lsb_release --id --short)" in
         Ubuntu|Debian)
             for package in "$python_package" python-virtualenv; do
             if [ "$(dpkg --status -- "$package" 2>/dev/null|sed -n 's/^Status: //p')" != "install ok installed" ]; then
                 # add a space after old values
+                #查询发现包$package不存在，将其加入到missing中，注意需要多加一个空格
                 missing="${missing:+$missing }$package"
             fi
             done
             if [ -n "$missing" ]; then
+            	#要求用户安装相应的包
                 echo "$0: missing required packages, please install them:" 1>&2
                 echo "  sudo apt-get install $missing"
                 exit 1

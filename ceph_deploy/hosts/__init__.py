@@ -1,3 +1,4 @@
+#encoding:utf-8
 """
 We deal (mostly) with remote hosts. To avoid special casing each different
 commands (e.g. using `yum` as opposed to `apt`) we can make a one time call to
@@ -53,13 +54,16 @@ def get(hostname,
     except IOError as error:
         if 'already closed' in getattr(error, 'message', ''):
             raise RuntimeError('remote connection got closed, ensure ``requiretty`` is disabled for %s' % hostname)
+    #获取系统信息
     distro_name, release, codename = conn.remote_module.platform_information()
     if not codename or not _get_distro(distro_name):
+        #报错，不认识当前待安装的平台
         raise exc.UnsupportedPlatform(
             distro=distro_name,
             codename=codename,
             release=release)
 
+    #获取系统体系
     machine_type = conn.remote_module.machine_type()
     module = _get_distro(distro_name, use_rhceph=use_rhceph)
     module.name = distro_name
@@ -69,7 +73,7 @@ def get(hostname,
     module.is_el = module.normalized_name in ['redhat', 'centos', 'fedora', 'scientific', 'oracle', 'virtuozzo']
     module.is_rpm = module.normalized_name in ['redhat', 'centos',
                                                'fedora', 'scientific', 'suse', 'oracle', 'virtuozzo']
-    module.is_deb = not module.is_rpm
+    module.is_deb = not module.is_rpm #使用deb包
     module.release = release
     module.codename = codename
     module.conn = conn
@@ -87,6 +91,7 @@ def _get_distro(distro, fallback=None, use_rhceph=False):
     if not distro:
         return
 
+    #先规范化名称
     distro = _normalized_distro_name(distro)
     distributions = {
         'debian': debian,
@@ -101,11 +106,13 @@ def _get_distro(distro, fallback=None, use_rhceph=False):
         }
 
     if distro == 'redhat' and use_rhceph:
+        #选用rhel,返回ceph_deploy.hosts.rhel
         return rhel
     else:
+        #查表返回相应的包
         return distributions.get(distro) or _get_distro(fallback)
 
-
+#规则化发行版本名称
 def _normalized_distro_name(distro):
     distro = distro.lower()
     if distro.startswith(('redhat', 'red hat')):
@@ -125,6 +132,7 @@ def _normalized_distro_name(distro):
     return distro
 
 
+#规范化版本号
 def _normalized_release(release):
     """
     A normalizer function to make sense of distro

@@ -1,3 +1,4 @@
+#encoding:utf-8
 import pkg_resources
 import argparse
 import logging
@@ -79,6 +80,7 @@ def get_parser():
         help='description',
         )
     sub.required = True
+    #取setup.py中指定的扩展点，注册不同command对应的不同处理函数
     entry_points = [
         (ep.name, ep.load())
         for ep in pkg_resources.iter_entry_points('ceph_deploy.cli')
@@ -125,6 +127,7 @@ def _main(args=None, namespace=None):
     root_logger.setLevel(logging.DEBUG)
     root_logger.addHandler(sh)
 
+    #构造命令解析器
     parser = get_parser()
     if len(sys.argv) < 2:
         parser.print_help()
