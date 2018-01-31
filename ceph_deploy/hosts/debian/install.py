@@ -69,6 +69,7 @@ def install(distro, version_kind, version, adjust_repos, **kw):
 
     # TODO this does not downgrade -- should it?
     if packages:
+        #调用apt安装相关的包
         distro.packager.install(
             packages,
             extra_install_flags=extra_install_flags

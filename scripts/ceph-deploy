@@ -5,7 +5,7 @@ import sys
 """
 ceph-deploy - admin tool for ceph
 """
-
+sys.path.insert(0,'/home/anlang/workspace/anlaneg_ceph-deploy')
 if os.path.exists('/usr/share/pyshared/ceph_deploy'):
     sys.path.insert(0,'/usr/share/pyshared/ceph_deploy')
 elif os.path.exists('/usr/share/ceph-deploy'):
@@ -16,6 +16,7 @@ elif os.path.exists('/usr/lib/python2.6/site-packages/ceph_deploy'):
     sys.path.insert(0,'/usr/lib/python2.6/site-packages/ceph_deploy')
 
 from ceph_deploy.cli import main
-
+#import pdb
+#pdb.set_trace()
 if __name__ == '__main__':
     sys.exit(main())

@@ -80,6 +80,8 @@ def get_parser():
         help='description',
         )
     sub.required = True
+    #import pdb
+    #pdb.set_trace()
     #取setup.py中指定的扩展点，注册不同command对应的不同处理函数
     entry_points = [
         (ep.name, ep.load())

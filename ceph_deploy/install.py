@@ -108,6 +108,7 @@ def install(args):
 
     for hostname in args.host:
         LOG.debug('Detecting platform for host %s ...', hostname)
+        #获取os发生版本名称
         distro = hosts.get(
             hostname,
             username=args.username,
@@ -127,6 +128,7 @@ def install(args):
         )
 
         components = detect_components(args, distro)
+        #采用sysvinit来启动，但cluster不为ceph,报错
         if distro.init == 'sysvinit' and args.cluster != 'ceph':
             LOG.error('refusing to install on host: %s, with custom cluster name: %s' % (
                     hostname,

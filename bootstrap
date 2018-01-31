@@ -5,6 +5,7 @@ set -e
 python_executable="python$1"
 
 if ! [ -d virtualenv ]; then
+	#存在命令lsb_release命令的情况下
     if command -v lsb_release >/dev/null 2>&1; then
         if [ "$1" = "2" ]; then
             python_package="python"
@@ -47,6 +48,7 @@ if ! [ -d virtualenv ]; then
         esac
     fi
 
+	#处理存在redhat-release的情况下
     if [ -f /etc/redhat-release ]; then
         case "$(cat /etc/redhat-release | awk '{print $1}')" in
         CentOS)
