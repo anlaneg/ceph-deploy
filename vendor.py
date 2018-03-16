@@ -1,3 +1,4 @@
+#encoding:utf-8
 from __future__ import print_function
 
 import subprocess
@@ -15,7 +16,7 @@ retrieved.
 This means that it will *not* work as expected. Errors encountered:
 """
 
-
+#给定命令并执行
 def run(cmd):
     print('[vendoring] Running command: %s' % ' '.join(cmd))
     try:
@@ -30,6 +31,7 @@ def run(cmd):
         print_error([], traceback.format_exc(error).split('\n'))
         raise SystemExit(1)
 
+    #等待进程执行完成
     if result.wait():
         print_error(result.stdout.readlines(), result.stderr.readlines())
 
@@ -39,8 +41,10 @@ def run(cmd):
 def print_error(stdout, stderr):
     print('*'*80)
     print(error_msg)
+    #显示标准输出
     for line in stdout:
         print(line)
+    #显示错误输出
     for line in stderr:
         print(line)
     print('*'*80)

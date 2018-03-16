@@ -1,3 +1,4 @@
+#encoding:utf-8
 import os
 try:
     from urllib.parse import urlparse

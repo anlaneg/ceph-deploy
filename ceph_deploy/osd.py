@@ -1,3 +1,4 @@
+#encoding:utf-8
 import argparse
 import json
 import logging
@@ -193,11 +194,11 @@ def create_osd(
     ceph_volume_executable = system.executable_path(conn, 'ceph-volume')
     args = [
         ceph_volume_executable,
-        '--cluster', cluster,
+        '--cluster', cluster,#指出集群名称
         'lvm',
         'create',
-        '--%s' % storetype,
-        '--data', data
+        '--%s' % storetype,#存储类型
+        '--data', data #数据存放位置
     ]
     if zap:
         LOG.warning('zapping is no longer supported when preparing')
@@ -214,12 +215,14 @@ def create_osd(
             args.append('--block.db')
             args.append(block_db)
     elif storetype == 'filestore':
+        #针对filestore需要指出journal的位置
         if not journal:
             raise RuntimeError('A journal lv or GPT partition must be specified when using filestore')
         args.append('--journal')
         args.append(journal)
 
     if kw.get('debug'):
+        #含调试信息
         remoto.process.run(
             conn,
             args,
@@ -282,6 +285,7 @@ def create(args, cfg, create=False):
         if args.filestore:
             storetype = 'filestore'
 
+        #执行osd创建
         create_osd(
             distro.conn,
             cluster=args.cluster,
@@ -419,8 +423,10 @@ def osd(args):
     cfg = conf.ceph.load(args)
 
     if args.subcommand == 'list':
+        #收到osd的list命令
         osd_list(args, cfg)
     elif args.subcommand == 'create':
+        #收到osd的创建命令，执行创建
         create(args, cfg)
     else:
         LOG.error('subcommand %s not implemented', args.subcommand)

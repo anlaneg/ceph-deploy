@@ -165,6 +165,7 @@ def mirror_install(distro, repo_url, gpg_url, adjust_repos, extra_installs=True,
         distro.packager.install(packages)
 
 
+#安装repo,安装packages中规定的包
 def repo_install(distro, reponame, baseurl, gpgkey, **kw):
     packages = map_components(
         NON_SPLIT_PACKAGES,

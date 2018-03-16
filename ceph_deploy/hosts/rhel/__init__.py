@@ -1,3 +1,4 @@
+#encoding:utf-8
 from . import mon  # noqa
 from .install import install, mirror_install, repo_install  # noqa
 from .uninstall import uninstall  # noqa

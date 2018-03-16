@@ -1,3 +1,4 @@
+#encoding:utf-8
 import socket
 from ceph_deploy.lib import remoto
 

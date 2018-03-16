@@ -1,3 +1,5 @@
+#encoding:utf-8
+#new文件主要是创建一个集群的简单配置文件，且生成mon的keyring
 import errno
 import logging
 import os
@@ -17,9 +19,10 @@ from ceph_deploy.connection import get_local_connection
 
 LOG = logging.getLogger(__name__)
 
-
+#随机生成一个key(长度为16字节）
 def generate_auth_key():
     key = os.urandom(16)
+    #构造key头部数据结构，2字节的算法类型，4字节的创建时间，4字节的创建秒数，2字节的key长度
     header = struct.pack(
         '<hiih',
         1,                 # le16 type: CEPH_CRYPTO_AES
@@ -27,9 +30,10 @@ def generate_auth_key():
         0,                 # le32 created: nanoseconds,
         len(key),          # le16: len(key)
     )
+    #对header及key进行base64编码
     return base64.b64encode(header + key).decode('utf-8')
 
-
+#实现无密码ssh连接
 def ssh_copy_keys(hostname, username=None):
     LOG.info('making sure passwordless SSH succeeds')
     if ssh.can_connect_passwordless(hostname):
@@ -75,6 +79,7 @@ def ssh_copy_keys(hostname, username=None):
     distro.conn.exit()
 
 
+#ip地址校验
 def validate_host_ip(ips, subnets):
     """
     Make sure that a given host all subnets specified will have at least one IP
@@ -113,19 +118,26 @@ def get_public_network_ip(ips, public_subnet):
     msg = "IPs (%s) are not valid for any of subnet specified %s" % (str(ips), str(public_subnet))
     raise RuntimeError(msg)
 
-
+#ceph-deploy new 执行
 def new(args):
+    import pdb
+    pdb.set_trace()
     if args.ceph_conf:
+        #已给定ceph_conf
         raise RuntimeError('will not create a Ceph conf file if attemtping to re-use with `--ceph-conf` flag')
     LOG.debug('Creating new cluster named %s', args.cluster)
     cfg = conf.ceph.CephConf()
+    #添加global段
     cfg.add_section('global')
 
+    #生成fsid
     fsid = args.fsid or uuid.uuid4()
+    #生成配置项fsid
     cfg.set('global', 'fsid', str(fsid))
 
     # if networks were passed in, lets set them in the
     # global section
+    #设置公共网络及集群网络
     if args.public_network:
         cfg.set('global', 'public network', str(args.public_network))
 
@@ -138,9 +150,11 @@ def new(args):
     for (name, host) in mon_hosts(args.mon):
         # Try to ensure we can ssh in properly before anything else
         if args.ssh_copykey:
+            #如果需要实现无密码ssh登录
             ssh_copy_keys(host, args.username)
 
         # Now get the non-local IPs from the remote node
+        #获取对端的信息
         distro = hosts.get(host, username=args.username)
         remote_ips = net.ip_addresses(distro.conn)
 
@@ -154,6 +168,7 @@ def new(args):
         distro.conn.exit()
 
         # Validate subnets if we received any
+        #如果需要校验public,cluster的network
         if args.public_network or args.cluster_network:
             validate_host_ip(remote_ips, [args.public_network, args.cluster_network])
 
@@ -179,23 +194,28 @@ def new(args):
     LOG.debug('Monitor initial members are %s', mon_initial_members)
     LOG.debug('Monitor addrs are %s', mon_host)
 
+    #配置mon成员名称
     cfg.set('global', 'mon initial members', ', '.join(mon_initial_members))
     # no spaces here, see http://tracker.newdream.net/issues/3145
+    #配置mon主机地址
     cfg.set('global', 'mon host', ','.join(mon_host))
 
     # override undesirable defaults, needed until bobtail
 
     # http://tracker.ceph.com/issues/6788
+    # 配置各授权协议
     cfg.set('global', 'auth cluster required', 'cephx')
     cfg.set('global', 'auth service required', 'cephx')
     cfg.set('global', 'auth client required', 'cephx')
 
+    #生成配置文件名称
     path = '{name}.conf'.format(
         name=args.cluster,
         )
 
     new_mon_keyring(args)
 
+    #写配置文件到磁盘
     LOG.debug('Writing initial config to %s...', path)
     tmp = '%s.tmp' % path
     with open(tmp, 'w') as f:
@@ -211,8 +231,10 @@ def new(args):
 
 def new_mon_keyring(args):
     LOG.debug('Creating a random mon key...')
+    #生成key及key配置文件
     mon_keyring = '[mon.]\nkey = %s\ncaps mon = allow *\n' % generate_auth_key()
 
+    #写mon的keyring配置文件
     keypath = '{name}.mon.keyring'.format(
         name=args.cluster,
         )

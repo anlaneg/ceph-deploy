@@ -1,4 +1,5 @@
 #encoding:utf-8
+#主要完成基础软件包的安装，未进行配置
 import argparse
 import logging
 import os
@@ -29,7 +30,7 @@ def sanitize_args(args):
 
     return args
 
-
+#监测需要安装哪些包
 def detect_components(args, distro):
     """
     Since the package split, now there are various different Ceph components to

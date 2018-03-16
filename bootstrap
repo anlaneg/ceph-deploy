@@ -101,6 +101,7 @@ if ! [ -d virtualenv ]; then
     fi
 fi
 
+#安装虚拟环境，在虚拟环境中部署ceph-deploy
 test -d virtualenv || virtualenv -p "$python_executable" virtualenv
 ./virtualenv/bin/python setup.py develop
 test -e ceph-deploy || ln -s virtualenv/bin/ceph-deploy .

@@ -38,6 +38,7 @@ def log_flags(args, logger=None):
 
 
 def get_parser():
+    #定义ceph-deploy的参数解析器（加载扩展点）
     parser = argparse.ArgumentParser(
         prog='ceph-deploy',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -90,7 +91,9 @@ def get_parser():
     entry_points.sort(
         key=lambda name_fn: getattr(name_fn[1], 'priority', 100),
         )
+    #遍历每个扩展点名称及对应函数
     for (name, fn) in entry_points:
+        #将此扩展点名称当参数加入到sub中，例如支持 ceph_deploy osd命令
         p = sub.add_parser(
             name,
             description=fn.__doc__,
@@ -101,6 +104,7 @@ def get_parser():
 
         # flag if the default release is being used
         p.set_defaults(default_release=False)
+        #执行扩展点函数，完成扩展点参数注册
         fn(p)
         p.required = True
     parser.set_defaults(
@@ -110,6 +114,7 @@ def get_parser():
     return parser
 
 
+#整体上是在做一个架子，通过加载扩展来支持新的命令，在参数解析后，执行参数对应的函数
 @catches((KeyboardInterrupt, RuntimeError, exc.DeployError,), handle_all=True)
 def _main(args=None, namespace=None):
     # Set console logging first with some defaults, to prevent having exceptions
@@ -135,6 +140,7 @@ def _main(args=None, namespace=None):
         parser.print_help()
         sys.exit()
     else:
+        #解析用户输入的参数,如果输入参数有误，将扔出异常
         args = parser.parse_args(args=args, namespace=namespace)
 
     console_loglevel = logging.DEBUG  # start at DEBUG for now
@@ -166,6 +172,7 @@ def _main(args=None, namespace=None):
     )
     log_flags(args)
 
+    #处理对应的命令函数
     return args.func(args)
 
 

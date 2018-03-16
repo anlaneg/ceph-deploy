@@ -1,3 +1,4 @@
+#encoding:utf-8
 from ceph_deploy.exc import ExecutableNotFound
 from ceph_deploy.lib import remoto
 
